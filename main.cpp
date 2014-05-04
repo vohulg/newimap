@@ -11,8 +11,6 @@
 #define IMAP_HOST           "imap.mail.ru"
 #define IMAP_PORT           (993)
 #define IMAP_USE_SSL        (true)
-//hello
-//ok
 
 #define IMAP_USERNAME       "testov-79@mail.ru"
 #define IMAP_PASSWORD       "testtest"
