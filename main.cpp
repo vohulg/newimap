@@ -31,6 +31,7 @@ int main (int argc, char **argv) {
         IMAP_MAIN_ABORT("login()", imap.errorString());
 
     qDebug() << imap.list();
+    ;
 
     ImapMailbox *mailbox = imap.select("INBOX");
     if (mailbox == NULL)
