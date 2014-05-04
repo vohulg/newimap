@@ -7,7 +7,7 @@
 #include "imapmessage.h"
 #include "imapaddress.h"
 #include "imap.h"
-//hello
+//hello world
 
 #define IMAP_HOST           "imap.mail.ru"
 #define IMAP_PORT           (993)
