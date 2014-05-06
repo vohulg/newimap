@@ -238,7 +238,9 @@ QByteArray ImapPrivate::readLine (bool *ok) {
 }
 
 bool ImapPrivate::isMultiline (const QString& data) const {
-    return(QRegExp("^.*\\{\\d+\\}$").exactMatch(data.trimmed()));
+
+    bool res = QRegExp("^.*\\{\\d+\\}$").exactMatch(data.trimmed());
+    return(res);
 }
 
 bool ImapPrivate::isResponseOk (const QByteArray& response) const {
@@ -253,18 +255,28 @@ bool ImapPrivate::isResponseOk (const QByteArray& response) const {
 
 bool ImapPrivate::isResponseEnd (const QString& response) const {
     QString trimmed = response.trimmed().toUpper();
-
+    //QString fetchEnd;
+   // fetchEnd.arg(IMAP_TAG);
     if (trimmed.contains(m_lastId + " OK")) {
         trimmed = trimmed.replace(".", "").replace("(", "").replace(")", "");
         return(trimmed.endsWith("SUCCESS") || 
                trimmed.endsWith("COMPLETED"));
-    } else if (trimmed.contains(m_lastId + " BAD")) {
+    }
+    else if (trimmed.contains(m_lastId + " BAD")) {
         return(true);
-    } else if (trimmed.contains(m_lastId + " NO")) {
+    }
+    else if (trimmed.contains(m_lastId + " NO")) {
+        return(true);
+    }
+    else if (trimmed.contains(m_lastId + " OK")) {
         return(true);
     }
 
-    return(false);
+    else if (trimmed == ((Qstr)IMAP_TAG + " OK FETCH DONE")) {
+        return(true);
+    }
+
+   return(false);
 }
 
 
@@ -316,8 +328,11 @@ QByteArray ImapPrivate::hmacMd5 (const QString& username,
 ImapMailbox *ImapPrivate::parseMailbox (const QString& mailboxName) {
     ImapMailbox *mailbox = NULL;       
     
+
     QByteArray response = readLine();
-    if (response.startsWith('*')) {
+    //QByteArray response = socket->readAll().data();
+
+    if (response.startsWith(IMAP_TAG)) {
         QRegExp regexUnseen("\\[UNSEEN (\\d+)\\]");
         QRegExp regexExists("(\\d+) EXISTS");
         QRegExp regexRecent("(\\d+) RECENT");
@@ -828,6 +843,7 @@ ImapMailbox *Imap::fetch (ImapMailbox *mailbox) {
     if (!d->sendCommand("FETCH 1:* ALL"))
         return(NULL);
 
+   qDebug() << "---------fetch-------\n" << d->socket->readAll().data();
     return(d->parseMessages(mailbox));
 }
 
@@ -982,6 +998,7 @@ QList<int> Imap::search (const QString& criteria) {
     if (!d->sendCommand("SEARCH %1", QStringList() << criteria))
         return(messageList);    
 
+    //QByteArray response = d->readLine();
     QByteArray response = d->readLine();
     if (!response.startsWith("* SEARCH")) {
         d->responseErrorMsg = response;
@@ -1012,6 +1029,12 @@ QList<int> Imap::search (const QString& criteria) {
 
     return(messageList);
 }
+
+/** Search for Unseen Messages. */
+QList<int> Imap::searchALL (void) {
+    return(search("ALL"));
+}
+
 
 /** Search for Messages with specified TO criteria. */
 QList<int> Imap::searchTo (const QString& criteria) {

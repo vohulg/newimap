@@ -30,7 +30,7 @@ int main (int argc, char **argv) {
     if (!imap.login(IMAP_USERNAME, IMAP_PASSWORD, IMAP_LOGIN_TYPE))
         IMAP_MAIN_ABORT("login()", imap.errorString());
 
-    qDebug() << imap.list();
+   // qDebug() << imap.list();
     ;
 
     ImapMailbox *mailbox = imap.select("INBOX");
@@ -45,11 +45,14 @@ int main (int argc, char **argv) {
     qDebug() << " - Flags:" << mailbox->flags();
 
     //QList<int> messageList = imap.searchText("\"Test mail attachment binary\"");
-    QList<int> messageList = imap.searchRecentUnseen();
+   // QList<int> messageList = imap.searchRecentUnseen();
+    QList<int> messageList = imap.searchALL();
     qDebug() << messageList;
 
     if (imap.fetch(mailbox, messageList) == NULL)
         IMAP_MAIN_ABORT("fetch()", imap.errorString());
+
+
 
     foreach (int msgId, messageList) {
         ImapMessage *message = mailbox->findById(msgId);
