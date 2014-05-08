@@ -46,15 +46,20 @@ int main (int argc, char **argv) {
 
     //QList<int> messageList = imap.searchText("\"Test mail attachment binary\"");
    // QList<int> messageList = imap.searchRecentUnseen();
+
     QList<int> messageList = imap.searchALL();
-    qDebug() << messageList;
+    qDebug() << "messageList:" << messageList;
+
+    if (imap.fetchHeaders(1) == NULL)
+        IMAP_MAIN_ABORT("fetchHeaders(1)", imap.errorString());
 
     if (imap.fetch(mailbox, messageList) == NULL)
         IMAP_MAIN_ABORT("fetch()", imap.errorString());
 
 
 
-    foreach (int msgId, messageList) {
+
+   foreach (int msgId, messageList) {
         ImapMessage *message = mailbox->findById(msgId);
         if (message == NULL) {
             qDebug() << "Message" << msgId << "Not Found.";
@@ -90,6 +95,7 @@ int main (int argc, char **argv) {
             qDebug() << "=======================================================";
         }
     }
+
 
     // Detroy Mailbox.
     delete mailbox;

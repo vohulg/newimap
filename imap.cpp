@@ -23,7 +23,7 @@
 #endif
 
 //#define IMAP_TAG        "THIMAP"
-#define IMAP_TAG        "IMAP4rev1"
+#define IMAP_TAG        "IMAP4"
 
 // ===========================================================================
 //  PRIVATE Functions
@@ -272,7 +272,7 @@ bool ImapPrivate::isResponseEnd (const QString& response) const {
         return(true);
     }
 
-    else if (trimmed == ((Qstr)IMAP_TAG + " OK FETCH DONE")) {
+    else if (trimmed.contains(m_lastId.toUpper() + " OK FETCH")) {
         return(true);
     }
 
@@ -486,7 +486,7 @@ QString Imap::decode (const QString& text) {
 }
 
 QByteArray Imap::decode (const QByteArray& text) {
-    QRegExp rx("=\\?([^\\?]+)\\?([^\\?]+)\\?([^\\?]+)\\?=");
+    QRegExp rx("=\\?  ([^\\?]+)  \\?   ([^\\?]+)\\?([^\\?]+)\\?=");
     QByteArray output;
     int pos = 0;
 
