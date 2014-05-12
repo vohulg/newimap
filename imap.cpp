@@ -23,7 +23,7 @@
 #endif
 
 //#define IMAP_TAG        "THIMAP"
-#define IMAP_TAG        "IMAP4rev1"
+#define IMAP_TAG        "IMAP4"
 
 // ===========================================================================
 //  PRIVATE Functions
@@ -257,10 +257,11 @@ bool ImapPrivate::isResponseEnd (const QString& response) const {
     QString trimmed = response.trimmed().toUpper();
     //QString fetchEnd;
    // fetchEnd.arg(IMAP_TAG);
-    if (trimmed.contains(m_lastId + " OK")) {
+    if (trimmed.contains(m_lastId + " OK"))
+    {
         trimmed = trimmed.replace(".", "").replace("(", "").replace(")", "");
-        return(trimmed.endsWith("SUCCESS") || 
-               trimmed.endsWith("COMPLETED"));
+
+        return(trimmed.endsWith("SUCCESS") || trimmed.endsWith("COMPLETED") || trimmed.endsWith("DONE"));
     }
     else if (trimmed.contains(m_lastId + " BAD")) {
         return(true);
@@ -272,7 +273,7 @@ bool ImapPrivate::isResponseEnd (const QString& response) const {
         return(true);
     }
 
-    else if (trimmed == ((Qstr)IMAP_TAG + " OK FETCH DONE")) {
+    else if (trimmed.contains(m_lastId.toUpper() + " OK FETCH")) {
         return(true);
     }
 
@@ -496,6 +497,7 @@ QByteArray Imap::decode (const QByteArray& text) {
 
         if (method == "b") {
             output += QByteArray::fromBase64(data.toLatin1());
+
         } else if (!data.isEmpty()) {
             bool ok;
             for (int i = 0; i < data.size(); ++i) {
